@@ -177,6 +177,11 @@ growproc(int n)
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
+
+//>>>>>>>>>>>>>>>>> DefiniÃ§Ã£o do nÃºmero padrÃ£o e maximo de tickets por processo
+#define PADRAO 10
+#define MAXIMO 50
+
 int
 fork(int tickets)
 {
@@ -208,15 +213,15 @@ fork(int tickets)
       np->ofile[i] = filedup(curproc->ofile[i]);
   np->cwd = idup(curproc->cwd);
 
-  // Distribuição dos tickets
-  if(tickets <= 0) // Se zero recebe o padrao = 10
-    np->tickets = 10;
-  else if(tickets > 50) // se maior que 50 recebe 50 definido como maximo
-    np->tickets = 50;
-  else // se não recebe o que veio por parametro
+  //>>>>>>>>>>>>>>>>>>>>>>>>>> DistribuiÃ§Ã£o dos tickets
+  if(tickets <= 0)          // Se zero recebe o padrao = 10
+    np->tickets = PADRAO;
+  else if(tickets > MAXIMO)     // Se maior que 50 recebe 50 definido como maximo
+    np->tickets = MAXIMO;
+  else                      // Se nÃ£o recebe o que veio por parametro
     np->tickets = tickets;
 
-  cprintf("Tickets %d - Processo: %d\n", tickets, np->tickets);
+  cprintf("Tickets Processo: %d\n", np->tickets);
 
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
@@ -321,31 +326,34 @@ wait(void)
   }
 }
 
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>> FunÃ§Ã£o para somar os tickets dos processos prontos
 int
 totaltickets()
 {
   int cont = 0;
   struct proc *p;
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->state == RUNNABLE){
-      cont += p->tickets;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ // Passa por todos os processos
+    if(p->state == RUNNABLE){                         // Se o processo esta pronto
+      cont += p->tickets;                             // Somo a cont a qtd de tickets do processo
     }
   }
-  if(!cont)
-    cont++;
+  if(!cont) cont++; // Se o total de tickets Ã© zero, incrementa pois Ã© usado numa divisÃ£o
   return cont;
 }
 
-int randomico = 1;
+//>>>>>>>>>>>>>>>>>>>>>>>>>>> FunÃ§Ã£o para gerar um valor aleatÃ³rio
+int randomico = 1; // Variavel global, guarda o ultimo numero sorteado
 int
 random()
 {
   int tickets = totaltickets();
 
-  randomico = (((7 ^ randomico) + randomico * 13)* 997) % tickets ;
+  // O resto da divisÃ£o garante que o numero gerado fique na faixa de 0 ao maximo de tickets
+  randomico = (((7 ^ randomico) + randomico * 13)* 997) % tickets;
   if(randomico < 0) randomico *= -1;
 
-  // Ver Valor Sorteado
+  //>>>>>>>>>>>>>>>>>>>>>>>>>> Ver Valor Sorteado
   //if(tickets != 1)cprintf("Total Tickets: %d - Randomico: %d\n", tickets, randomico);
   
   return randomico;
@@ -372,16 +380,17 @@ scheduler(void)
     sti();
 
     // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
+    //>>>>>>>>>>>>>>>>>>>> Bloqueia a tabela de processos, aqui devemos impementar o escalonador
+    acquire(&ptable.lock); 
 
     tickets = random();
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ // Passa por todo os processos em ordem
-      if(p->state != RUNNABLE)
+      if(p->state != RUNNABLE)      // Se nÃ£o esta pronto vai para o proximo processo
         continue;
       else{                         // Para cada um dos processos prontos
         tickets -= p->tickets;      // Retira do ticket sorteado o numero de tickets do processo
-        if(tickets > 0)             // Ao zerar o ticket sorteado é definido o processo
+        if(tickets > 0)             // Ao zerar o ticket sorteado Ã© definido o processo
           continue;
       }
 
