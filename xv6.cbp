@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="xv6" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/xv6" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/xv6" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="BUGS" />
+		<Unit filename="LICENSE" />
+		<Unit filename="Makefile" />
+		<Unit filename="Notes" />
+		<Unit filename="README" />
+		<Unit filename="TRICKS" />
+		<Unit filename="_cat" />
+		<Unit filename="_echo" />
+		<Unit filename="_forktest" />
+		<Unit filename="_grep" />
+		<Unit filename="_init" />
+		<Unit filename="_kill" />
+		<Unit filename="_ln" />
+		<Unit filename="_ls" />
+		<Unit filename="_mkdir" />
+		<Unit filename="_rm" />
+		<Unit filename="_sh" />
+		<Unit filename="_stressfs" />
+		<Unit filename="_teste" />
+		<Unit filename="_usertests" />
+		<Unit filename="_wc" />
+		<Unit filename="_zombie" />
+		<Unit filename="asm.h" />
+		<Unit filename="bio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bio.d" />
+		<Unit filename="bio.o" />
+		<Unit filename="bootasm.S" />
+		<Unit filename="bootasm.d" />
+		<Unit filename="bootasm.o" />
+		<Unit filename="bootblock" />
+		<Unit filename="bootblock.asm" />
+		<Unit filename="bootblock.o" />
+		<Unit filename="bootblockother.o" />
+		<Unit filename="bootmain.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bootmain.d" />
+		<Unit filename="bootmain.o" />
+		<Unit filename="buf.h" />
+		<Unit filename="cat.asm" />
+		<Unit filename="cat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="cat.d" />
+		<Unit filename="cat.o" />
+		<Unit filename="cat.sym" />
+		<Unit filename="console.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="console.d" />
+		<Unit filename="console.o" />
+		<Unit filename="cuth" />
+		<Unit filename="date.h" />
+		<Unit filename="defs.h" />
+		<Unit filename="dot-bochsrc" />
+		<Unit filename="echo.asm" />
+		<Unit filename="echo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="echo.d" />
+		<Unit filename="echo.o" />
+		<Unit filename="echo.sym" />
+		<Unit filename="elf.h" />
+		<Unit filename="entry.S" />
+		<Unit filename="entry.o" />
+		<Unit filename="entryother" />
+		<Unit filename="entryother.S" />
+		<Unit filename="entryother.asm" />
+		<Unit filename="entryother.d" />
+		<Unit filename="entryother.o" />
+		<Unit filename="exec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="exec.d" />
+		<Unit filename="exec.o" />
+		<Unit filename="fcntl.h" />
+		<Unit filename="file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="file.d" />
+		<Unit filename="file.h" />
+		<Unit filename="file.o" />
+		<Unit filename="forktest.asm" />
+		<Unit filename="forktest.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="forktest.d" />
+		<Unit filename="forktest.o" />
+		<Unit filename="fs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fs.d" />
+		<Unit filename="fs.h" />
+		<Unit filename="fs.img" />
+		<Unit filename="fs.o" />
+		<Unit filename="gdbutil" />
+		<Unit filename="grep.asm" />
+		<Unit filename="grep.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="grep.d" />
+		<Unit filename="grep.o" />
+		<Unit filename="grep.sym" />
+		<Unit filename="ide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ide.d" />
+		<Unit filename="ide.o" />
+		<Unit filename="init.asm" />
+		<Unit filename="init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="init.d" />
+		<Unit filename="init.o" />
+		<Unit filename="init.sym" />
+		<Unit filename="initcode" />
+		<Unit filename="initcode.S" />
+		<Unit filename="initcode.asm" />
+		<Unit filename="initcode.d" />
+		<Unit filename="initcode.o" />
+		<Unit filename="initcode.out" />
+		<Unit filename="ioapic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ioapic.d" />
+		<Unit filename="ioapic.o" />
+		<Unit filename="kalloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="kalloc.d" />
+		<Unit filename="kalloc.o" />
+		<Unit filename="kbd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="kbd.d" />
+		<Unit filename="kbd.h" />
+		<Unit filename="kbd.o" />
+		<Unit filename="kernel" />
+		<Unit filename="kernel.asm" />
+		<Unit filename="kernel.ld" />
+		<Unit filename="kernel.sym" />
+		<Unit filename="kill.asm" />
+		<Unit filename="kill.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="kill.d" />
+		<Unit filename="kill.o" />
+		<Unit filename="kill.sym" />
+		<Unit filename="lapic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lapic.d" />
+		<Unit filename="lapic.o" />
+		<Unit filename="ln.asm" />
+		<Unit filename="ln.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ln.d" />
+		<Unit filename="ln.o" />
+		<Unit filename="ln.sym" />
+		<Unit filename="log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="log.d" />
+		<Unit filename="log.o" />
+		<Unit filename="ls.asm" />
+		<Unit filename="ls.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ls.d" />
+		<Unit filename="ls.o" />
+		<Unit filename="ls.sym" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.d" />
+		<Unit filename="main.o" />
+		<Unit filename="memide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="memlayout.h" />
+		<Unit filename="mkdir.asm" />
+		<Unit filename="mkdir.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mkdir.d" />
+		<Unit filename="mkdir.o" />
+		<Unit filename="mkdir.sym" />
+		<Unit filename="mkfs" />
+		<Unit filename="mkfs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mmu.h" />
+		<Unit filename="mp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mp.d" />
+		<Unit filename="mp.h" />
+		<Unit filename="mp.o" />
+		<Unit filename="param.h" />
+		<Unit filename="picirq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="picirq.d" />
+		<Unit filename="picirq.o" />
+		<Unit filename="pipe.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pipe.d" />
+		<Unit filename="pipe.o" />
+		<Unit filename="pr.pl" />
+		<Unit filename="printf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="printf.d" />
+		<Unit filename="printf.o" />
+		<Unit filename="printpcs" />
+		<Unit filename="proc-old.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc.d" />
+		<Unit filename="proc.h" />
+		<Unit filename="proc.o" />
+		<Unit filename="rm.asm" />
+		<Unit filename="rm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="rm.d" />
+		<Unit filename="rm.o" />
+		<Unit filename="rm.sym" />
+		<Unit filename="runoff" />
+		<Unit filename="runoff.list" />
+		<Unit filename="runoff.spec" />
+		<Unit filename="runoff1" />
+		<Unit filename="sh.asm" />
+		<Unit filename="sh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sh.d" />
+		<Unit filename="sh.o" />
+		<Unit filename="sh.sym" />
+		<Unit filename="show1" />
+		<Unit filename="sign.pl" />
+		<Unit filename="sleep1.p" />
+		<Unit filename="sleeplock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sleeplock.d" />
+		<Unit filename="sleeplock.h" />
+		<Unit filename="sleeplock.o" />
+		<Unit filename="spinlock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spinlock.d" />
+		<Unit filename="spinlock.h" />
+		<Unit filename="spinlock.o" />
+		<Unit filename="spinp" />
+		<Unit filename="stat.h" />
+		<Unit filename="stressfs.asm" />
+		<Unit filename="stressfs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="stressfs.d" />
+		<Unit filename="stressfs.o" />
+		<Unit filename="stressfs.sym" />
+		<Unit filename="string.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="string.d" />
+		<Unit filename="string.o" />
+		<Unit filename="swtch.S" />
+		<Unit filename="swtch.o" />
+		<Unit filename="syscall.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="syscall.d" />
+		<Unit filename="syscall.h" />
+		<Unit filename="syscall.o" />
+		<Unit filename="sysfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sysfile.d" />
+		<Unit filename="sysfile.o" />
+		<Unit filename="sysproc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sysproc.d" />
+		<Unit filename="sysproc.o" />
+		<Unit filename="teste.asm" />
+		<Unit filename="teste.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="teste.d" />
+		<Unit filename="teste.o" />
+		<Unit filename="teste.sym" />
+		<Unit filename="toc.ftr" />
+		<Unit filename="toc.hdr" />
+		<Unit filename="trap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="trap.d" />
+		<Unit filename="trap.o" />
+		<Unit filename="trapasm.S" />
+		<Unit filename="trapasm.o" />
+		<Unit filename="traps.h" />
+		<Unit filename="types.h" />
+		<Unit filename="uart.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="uart.d" />
+		<Unit filename="uart.o" />
+		<Unit filename="ulib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ulib.d" />
+		<Unit filename="ulib.o" />
+		<Unit filename="umalloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="umalloc.d" />
+		<Unit filename="umalloc.o" />
+		<Unit filename="user.h" />
+		<Unit filename="usertests.asm" />
+		<Unit filename="usertests.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usertests.d" />
+		<Unit filename="usertests.o" />
+		<Unit filename="usertests.sym" />
+		<Unit filename="usys.S" />
+		<Unit filename="usys.o" />
+		<Unit filename="vectors.S" />
+		<Unit filename="vectors.o" />
+		<Unit filename="vectors.pl" />
+		<Unit filename="vm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="vm.d" />
+		<Unit filename="vm.o" />
+		<Unit filename="wc.asm" />
+		<Unit filename="wc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="wc.d" />
+		<Unit filename="wc.o" />
+		<Unit filename="wc.sym" />
+		<Unit filename="x86.h" />
+		<Unit filename="xv6.cbp" />
+		<Unit filename="xv6.img" />
+		<Unit filename="zombie.asm" />
+		<Unit filename="zombie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zombie.d" />
+		<Unit filename="zombie.o" />
+		<Unit filename="zombie.sym" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

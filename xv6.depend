@@ -1,0 +1,26 @@
+# depslib dependency file v1.0
+1538096010 source:/home/natan/Área de Trabalho/xv6/bio.c
+	"types.h"
+	"defs.h"
+	"param.h"
+	"spinlock.h"
+	"sleeplock.h"
+	"fs.h"
+	"buf.h"
+
+1538096010 /home/natan/Área de Trabalho/xv6/types.h
+
+1538096312 /home/natan/Área de Trabalho/xv6/defs.h
+
+1538096010 /home/natan/Área de Trabalho/xv6/param.h
+
+1538096010 /home/natan/Área de Trabalho/xv6/spinlock.h
+
+1538096010 /home/natan/Área de Trabalho/xv6/sleeplock.h
+
+1538096010 /home/natan/Área de Trabalho/xv6/fs.h
+
+1538096010 /home/natan/Área de Trabalho/xv6/buf.h
+
+1538096717 source:/home/natan/Área de Trabalho/xv6/bio.d
+

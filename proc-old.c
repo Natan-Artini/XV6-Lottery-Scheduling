@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+#define TICKETS_DFLT 40 // Numero de tickets padrao (Default)
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -20,49 +22,17 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+// Função geradora de numeros aleatórios (de 0 até max - 1)
+unsigned long rand(int max){
+static unsigned long x=123456789,y=362436069,z=521288629,w=88675123;
+unsigned long t;
+t=(x^(x<<11));x=y;y=z;z=w; return( w=((w^(w>>19))^(t^(t>>8))) % max);
+}
+
 void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
-}
-
-// Must be called with interrupts disabled
-int
-cpuid() {
-  return mycpu()-cpus;
-}
-
-// Must be called with interrupts disabled to avoid the caller being
-// rescheduled between reading lapicid and running through the loop.
-struct cpu*
-mycpu(void)
-{
-  int apicid, i;
-  
-  if(readeflags()&FL_IF)
-    panic("mycpu called with interrupts enabled\n");
-  
-  apicid = lapicid();
-  // APIC IDs are not guaranteed to be contiguous. Maybe we should have
-  // a reverse map, or reserve a register to store &cpus[i].
-  for (i = 0; i < ncpu; ++i) {
-    if (cpus[i].apicid == apicid)
-      return &cpus[i];
-  }
-  panic("unknown apicid\n");
-}
-
-// Disable interrupts so that we are not rescheduled
-// while reading proc from the cpu structure
-struct proc*
-myproc(void) {
-  struct cpu *c;
-  struct proc *p;
-  pushcli();
-  c = mycpu();
-  p = c->proc;
-  popcli();
-  return p;
 }
 
 //PAGEBREAK: 32
@@ -88,6 +58,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->tickets = TICKETS_DFLT;
 
   release(&ptable.lock);
 
@@ -122,7 +93,6 @@ userinit(void)
 {
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
-
   p = allocproc();
   
   initproc = p;
@@ -159,18 +129,17 @@ int
 growproc(int n)
 {
   uint sz;
-  struct proc *curproc = myproc();
 
-  sz = curproc->sz;
+  sz = proc->sz;
   if(n > 0){
-    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
+    if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
       return -1;
   } else if(n < 0){
-    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
+    if((sz = deallocuvm(proc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
-  curproc->sz = sz;
-  switchuvm(curproc);
+  proc->sz = sz;
+  switchuvm(proc);
   return 0;
 }
 
@@ -182,43 +151,39 @@ fork(int tickets)
 {
   int i, pid;
   struct proc *np;
-  struct proc *curproc = myproc();
+
+  cprintf("Ticket: %d\n",tickets);
 
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
   }
 
-  // Copy process state from proc.
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
+  // Copy process state from p.
+  if((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
     return -1;
   }
-  np->sz = curproc->sz;
-  np->parent = curproc;
-  *np->tf = *curproc->tf;
+  np->sz = proc->sz;
+  np->parent = proc;
+  *np->tf = *proc->tf;
+
+  // Atribuiçao de tickets ao processo novo criado
+  np->tickets = tickets;
+  if(np->tickets <= 0) np->tickets = TICKETS_DFLT; 
+  
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
   for(i = 0; i < NOFILE; i++)
-    if(curproc->ofile[i])
-      np->ofile[i] = filedup(curproc->ofile[i]);
-  np->cwd = idup(curproc->cwd);
+    if(proc->ofile[i])
+      np->ofile[i] = filedup(proc->ofile[i]);
+  np->cwd = idup(proc->cwd);
 
-  // Distribuição dos tickets
-  if(tickets <= 0) // Se zero recebe o padrao = 10
-    np->tickets = 10;
-  else if(tickets > 50) // se maior que 50 recebe 50 definido como maximo
-    np->tickets = 50;
-  else // se não recebe o que veio por parametro
-    np->tickets = tickets;
-
-  cprintf("Tickets %d - Processo: %d\n", tickets, np->tickets);
-
-  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
 
   pid = np->pid;
 
@@ -227,6 +192,8 @@ fork(int tickets)
   np->state = RUNNABLE;
 
   release(&ptable.lock);
+
+//cprintf("Processo[%s], PID[%d], Tickets[%d]\n", np->name, np->pid, np->tickets);
 
   return pid;
 }
@@ -237,34 +204,33 @@ fork(int tickets)
 void
 exit(void)
 {
-  struct proc *curproc = myproc();
   struct proc *p;
   int fd;
 
-  if(curproc == initproc)
+  if(proc == initproc)
     panic("init exiting");
 
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
-    if(curproc->ofile[fd]){
-      fileclose(curproc->ofile[fd]);
-      curproc->ofile[fd] = 0;
+    if(proc->ofile[fd]){
+      fileclose(proc->ofile[fd]);
+      proc->ofile[fd] = 0;
     }
   }
 
   begin_op();
-  iput(curproc->cwd);
+  iput(proc->cwd);
   end_op();
-  curproc->cwd = 0;
+  proc->cwd = 0;
 
   acquire(&ptable.lock);
 
   // Parent might be sleeping in wait().
-  wakeup1(curproc->parent);
+  wakeup1(proc->parent);
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->parent == curproc){
+    if(p->parent == proc){
       p->parent = initproc;
       if(p->state == ZOMBIE)
         wakeup1(initproc);
@@ -272,7 +238,7 @@ exit(void)
   }
 
   // Jump into the scheduler, never to return.
-  curproc->state = ZOMBIE;
+  proc->state = ZOMBIE;
   sched();
   panic("zombie exit");
 }
@@ -284,14 +250,13 @@ wait(void)
 {
   struct proc *p;
   int havekids, pid;
-  struct proc *curproc = myproc();
-  
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited children.
     havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->parent != curproc)
+      if(p->parent != proc)
         continue;
       havekids = 1;
       if(p->state == ZOMBIE){
@@ -311,44 +276,14 @@ wait(void)
     }
 
     // No point waiting if we don't have any children.
-    if(!havekids || curproc->killed){
+    if(!havekids || proc->killed){
       release(&ptable.lock);
       return -1;
     }
 
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-    sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+    sleep(proc, &ptable.lock);  //DOC: wait-sleep
   }
-}
-
-int
-totaltickets()
-{
-  int cont = 0;
-  struct proc *p;
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->state == RUNNABLE){
-      cont += p->tickets;
-    }
-  }
-  if(!cont)
-    cont++;
-  return cont;
-}
-
-int randomico = 1;
-int
-random()
-{
-  int tickets = totaltickets();
-
-  randomico = (((7 ^ randomico) + randomico * 13)* 997) % tickets ;
-  if(randomico < 0) randomico *= -1;
-
-  // Ver Valor Sorteado
-  //if(tickets != 1)cprintf("Total Tickets: %d - Randomico: %d\n", tickets, randomico);
-  
-  return randomico;
 }
 
 //PAGEBREAK: 42
@@ -359,49 +294,57 @@ random()
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+// Soma dos tickets de processos que podem ser escalonados (Estão em running ou runnable)
+int qtdTickets(){
+  struct proc *p;
+  int sum = 0;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != RUNNABLE && p->state != RUNNING)  continue;
+    sum += p->tickets;
+  }
+
+  if(sum == 0) return TICKETS_DFLT;
+  return sum;
+}
+
 void
 scheduler(void)
 {
   struct proc *p;
-  struct cpu *c = mycpu();
-  c->proc = 0;
-  int tickets;
-  
+  int seletor, somaParcial, somaTotal;
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-
-    tickets = random();
-
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ // Passa por todo os processos em ordem
-      if(p->state != RUNNABLE)
-        continue;
-      else{                         // Para cada um dos processos prontos
-        tickets -= p->tickets;      // Retira do ticket sorteado o numero de tickets do processo
-        if(tickets > 0)             // Ao zerar o ticket sorteado é definido o processo
-          continue;
-      }
+    somaTotal = qtdTickets();
+    seletor = rand(somaTotal + 1);
+    somaParcial = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)  continue;
+      somaParcial += p->tickets;
+      if(somaParcial < seletor) continue;
+      //cprintf("Nome[%s] PID[%d] Tickets[%d] SomaTotal %d Seletor %d SomaParcial %d\n",p->name, p->pid, p->tickets, somaTotal, seletor, somaParcial);
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-      c->proc = p;
+      proc = p;
       switchuvm(p);
       p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
+      swtch(&cpu->scheduler, p->context);
       switchkvm();
+      //cprintf("[%s] PID[%d] Bilhetes[%d]. Seletor[%d]. SomaParcial[%d]\n", p->name, p->pid, p->tickets, seletor, somaParcial);
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
-      c->proc = 0;
+      proc = 0;
+      break;
     }
-
     release(&ptable.lock);
-
   }
 }
 
@@ -416,19 +359,18 @@ void
 sched(void)
 {
   int intena;
-  struct proc *p = myproc();
 
   if(!holding(&ptable.lock))
     panic("sched ptable.lock");
-  if(mycpu()->ncli != 1)
+  if(cpu->ncli != 1)
     panic("sched locks");
-  if(p->state == RUNNING)
+  if(proc->state == RUNNING)
     panic("sched running");
   if(readeflags()&FL_IF)
     panic("sched interruptible");
-  intena = mycpu()->intena;
-  swtch(&p->context, mycpu()->scheduler);
-  mycpu()->intena = intena;
+  intena = cpu->intena;
+  swtch(&proc->context, cpu->scheduler);
+  cpu->intena = intena;
 }
 
 // Give up the CPU for one scheduling round.
@@ -436,7 +378,7 @@ void
 yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
-  myproc()->state = RUNNABLE;
+  proc->state = RUNNABLE;
   sched();
   release(&ptable.lock);
 }
@@ -467,9 +409,7 @@ forkret(void)
 void
 sleep(void *chan, struct spinlock *lk)
 {
-  struct proc *p = myproc();
-  
-  if(p == 0)
+  if(proc == 0)
     panic("sleep");
 
   if(lk == 0)
@@ -485,14 +425,14 @@ sleep(void *chan, struct spinlock *lk)
     acquire(&ptable.lock);  //DOC: sleeplock1
     release(lk);
   }
-  // Go to sleep.
-  p->chan = chan;
-  p->state = SLEEPING;
 
+  // Go to sleep.
+  proc->chan = chan;
+  proc->state = SLEEPING;
   sched();
 
   // Tidy up.
-  p->chan = 0;
+  proc->chan = 0;
 
   // Reacquire original lock.
   if(lk != &ptable.lock){  //DOC: sleeplock2
